@@ -18,6 +18,9 @@ jobs:
         echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> ./app/.env
         echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> ./app/.env
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> ./app/.env
+        echo "TABLE_PREFIX=${{ secrets.DATABASE_HOST }}" >> ./app/.env
+        echo "DATABASE_PORT=${{ secrets.DATABASE_HOST }}" >> ./app/.env
+        echo "BASE_URL=${{ vars.DATABASE_HOST }}" >> ./app/.env
 
     - name: 🗃️ Initialize database schema
       env:

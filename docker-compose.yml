@@ -23,6 +23,8 @@ services:
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}   # Use the password from .env
       MYSQL_ROOT_PASSWORD:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:

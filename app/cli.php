@@ -2,6 +2,7 @@
 <?php
 
 // Self-contained CLI for "fifi" framework
+require 'autoloader.php';
 
 main($argv);
 
@@ -43,37 +44,25 @@ function loadEnv(string $file)
     }
 }
 
-function migrateDatabase()
+
+function migrateDatabase(string $modelsDir = __DIR__ . '/models')
 {
-    $host = getenv('DATABASE_HOST');
-    $dbname = getenv('DATABASE_NAME');
-    $user = getenv('DATABASE_USER');
-    $pass = getenv('DATABASE_PASSWORD');
+    $db = DB::getInstance();
 
-    $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
+    foreach (glob($modelsDir . '/*.php') as $file) {
+        require_once $file;
 
-    $sqlFile = __DIR__ . '/database/db.sql';
+        $className = pathinfo($file, PATHINFO_FILENAME);
 
-    if (!file_exists($sqlFile)) {
-        throw new Exception("SQL file not found at $sqlFile");
+        if (!class_exists($className)) continue;
+
+        $reflection = new ReflectionClass($className);
+        if ($reflection->isSubclassOf(Model::class) && !$reflection->isAbstract()) {
+            if ($reflection->hasMethod('generateSchema')) {
+                echo "Migrating: $className\n";
+                $schemaSQL = $className::generateSchema();
+                $db->query($schemaSQL);
+            }
+        }
     }
-
-    $sql = file_get_contents($sqlFile);
-
-    if (!$sql) {
-        throw new Exception("Could not read SQL file.");
-    }
-
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
-
-    echo "🚀 Running migration (idempotency test)...\n";
-
-    for ($i = 1; $i <= 2; $i++) {
-        echo "  Pass $i...\n";
-        $pdo->exec($sql);
-    }
-
-    echo "✅ Migration complete and idempotent.\n";
 }

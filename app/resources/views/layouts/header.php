@@ -30,6 +30,7 @@ $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['RE
     <meta name="twitter:title" content="<?php echo htmlspecialchars($title); ?>">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($description); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($image); ?>">
+    <link rel="icon" href="<?php echo htmlspecialchars($image); ?>" type="image/x-icon">
 
     <!-- style and scripts -->
     <link rel="stylesheet" href="assets/css/style.css">

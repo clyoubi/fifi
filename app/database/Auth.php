@@ -23,7 +23,7 @@ class Auth implements IAuth
     }
 
 
-    public static function getInstance()
+    public static function getInstance() : Auth
     {
         if (!self::$instance) {
             self::$instance = new Auth();

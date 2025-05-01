@@ -22,17 +22,9 @@ abstract class Model implements IModel
         foreach ($this->ignore as $key => $value) {
             $this->remove[] = $value;
         }
-
-        $this->getRequiredColumns();
-        /*DB::getInstance()->query(
-            "SELECT COLUMN_NAME
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = 'rg'
-            AND TABLE_NAME = ".TABLE_PREFIX.get_called_class());
-        */
     }
 
-    
+
     public static function find($id, $whereColumn = "id")
     {
         $query = "SELECT * FROM " . the_object_tablename(get_called_class()) . " WHERE $whereColumn = '$id' LIMIT 1";
@@ -54,7 +46,7 @@ abstract class Model implements IModel
 
 
 
-    protected function hasMany($object, $foreign_id = null)
+    protected function hasMany($object, $foreign_id = null): object
     {
         $columnName = strtolower(get_called_class()) . "_id";
 
@@ -67,17 +59,18 @@ abstract class Model implements IModel
         $models = [];
         foreach ($result as $key => $value) {
             $model = new $object();
-                $model->fromJson( $value );
+            $model->fromJson($value);
             $models[] = $model;
         }
         // $this->{object_to_prop_array_name($object)} = $this->toObject($result, $object);
         //$this->{get_called_class() . "s"} = $this->toObject($result, $object);
         // return $this->{object_to_prop_array_name($object)};
-        return $this->{strtolower($object."s")  } = $models;
+        return $this->{strtolower($object . "s")} = $models;
     }
 
 
-    protected function hasOne( $object, $foreign_id = null ){
+    protected function hasOne($object, $foreign_id = null)
+    {
 
         $columnName = strtolower(get_called_class()) . "_id";
 
@@ -89,22 +82,23 @@ abstract class Model implements IModel
 
         $model = new $object();;
         foreach ($result as $key => $value) {
-            $model->fromJson( $value );
+            $model->fromJson($value);
         }
         // $this->{object_to_prop_array_name($object)} = $this->toObject($result, $object);
         //$this->{get_called_class() . "s"} = $this->toObject($result, $object);
         // return $this->{object_to_prop_array_name($object)};
-        return $this->{strtolower($object)  } = $model;
+        return $this->{strtolower($object)} = $model;
     }
 
 
-    public function belongsTo( $object ){
+    public function belongsTo($object)
+    {
 
-        $columnName = strtolower(get_class( $object ) ) . "_id";
+        $columnName = strtolower(get_class($object)) . "_id";
 
-        $query = "SELECT * FROM ". the_object_tablename(get_called_class()). " WHERE id=".$this->id ." AND $columnName = ".$object->id;
+        $query = "SELECT * FROM " . the_object_tablename(get_called_class()) . " WHERE id=" . $this->id . " AND $columnName = " . $object->id;
 
-        if (DB::getInstance()->query($query)){
+        if (DB::getInstance()->query($query)) {
             return true;
         }
 
@@ -130,7 +124,7 @@ abstract class Model implements IModel
             $queryResult->free_result();
 
             if ($single) {
-                return ( isset( $objects[0] ) )?$objects[0]:false;
+                return (isset($objects[0])) ? $objects[0] : false;
             }
         } else {
             return null;
@@ -153,40 +147,39 @@ abstract class Model implements IModel
     }
 
 
-    public function save(){
-        
-        if (!is_array( $errors = $this->checkRequiredFields()) ) {
+    public function save()
+    {
+
+        if (!is_array($errors = $this->checkRequiredFields())) {
 
             $id = DB::getInstance()->insert($this, get_object_tablename($this));
             //return $id;
-        
+
 
             foreach ($this as $name => $value) {
-                if( !in_array($name, ['remove', 'required', 'fillable', 'ignore'])){
-                   
-                    if( is_array(  $value ) ){
+                if (!in_array($name, ['remove', 'required', 'fillable', 'ignore'])) {
+
+                    if (is_array($value)) {
                         foreach ($value as $key => $object) {
-                            $class = substr( $name, 0, strlen($name)-1);
+                            $class = substr($name, 0, strlen($name) - 1);
                             $model = new $class();
-                                $model->{strtolower(get_class($this))."_id"} = $id;
-                                $model->fromJson( $object );
-                                $model->save();
+                            $model->{strtolower(get_class($this)) . "_id"} = $id;
+                            $model->fromJson($object);
+                            $model->save();
                         }
-                    }else{
-                        if( $value instanceof Model ){
-                            $value->{get_class($value)."_id"} = $id;
+                    } else {
+                        if ($value instanceof Model) {
+                            $value->{get_class($value) . "_id"} = $id;
                             $value->save();
                         }
-                    }   
+                    }
                 }
-                
             }
-          
+
             return (new Response($this->find($id)))->sendJson();
-        }else{
+        } else {
             return (new Response($errors, false))->sendJson();
         }
-       
     }
 
 
@@ -195,7 +188,7 @@ abstract class Model implements IModel
     {
 
         if ($this->checkRequiredFields()) {
-            $id = DB::getInstance()->update( $this, get_object_tablename($this) );
+            $id = DB::getInstance()->update($this, get_object_tablename($this));
             return $this->find($id);
             // return (new Response($this->find($id)))->sendJson();
         }
@@ -222,29 +215,29 @@ abstract class Model implements IModel
     }
 
 
-    private function getRequiredColumns()
-    {
-        $query = "select GROUP_CONCAT(column_name) nonnull_columns from information_schema.columns where table_schema = '" . DATABASE_NAME . "' and table_name = '" . get_object_tablename($this) . "' and is_nullable = 'NO'";
-        $raw = DB::getInstance()->rowQuery($query, 'nonnull_columns');
-        $this->required = explode(',', $raw);
-        unset($this->required[0]);
-    }
+    // private function getRequiredColumns()
+    // {
+    //     $query = "select GROUP_CONCAT(column_name) nonnull_columns from information_schema.columns where table_schema = '" . DATABASE_NAME . "' and table_name = '" . get_object_tablename($this) . "' and is_nullable = 'NO'";
+    //     $raw = DB::getInstance()->rowQuery($query, 'nonnull_columns');
+    //     $this->required = explode(',', $raw);
+    //     unset($this->required[0]);
+    // }
 
 
     public function fromJson($jsonString = null)
     {
-    
+
         global $jsonObjectHeader;
-        $json = ( $jsonString == null)?$jsonObjectHeader:$jsonString;
+        $json = ($jsonString == null) ? $jsonObjectHeader : $jsonString;
 
         foreach ($json as $attribute => $value) {
 
-            if( !in_array($attribute, ['remove', 'required', 'fillable', 'ignore'])){
+            if (!in_array($attribute, ['remove', 'required', 'fillable', 'ignore'])) {
 
                 if (is_array($value)) {
 
                     $json = ltrim((string)json_encode($value));
-    
+
                     // value is an Object
                     if (strpos($json, '{') === 0) {
                         $model = new $attribute();
@@ -252,25 +245,74 @@ abstract class Model implements IModel
                         $this->$attribute = $model;
                         //return 'object';
                     }
-    
+
                     // value is a list of Objects
                     if (strpos($json, '[') === 0) {
-    
+
                         foreach ($value as $position => $object) {
-                            $class = substr( $attribute, 0, strlen($attribute)-1);
+                            $class = substr($attribute, 0, strlen($attribute) - 1);
                             $model = new $class();
                             $model->fromJson($object);
                             $this->$attribute[] = $model;
                         }
                     }
-                }else{
+                } else {
                     $this->$attribute = $value;
                 }
-
             }
-            
         }
     }
 
+    public static function generateSchema(): string
+    {
+        $class = get_called_class();
+        $instance = new $class();
+        $table = the_object_tablename($class);
+    
+        $sql = "CREATE TABLE IF NOT EXISTS $table (\n";
+        $sql .= "  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n";
+    
+        $reflect = new ReflectionClass($instance);
+        foreach ($reflect->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            $name = $property->getName();
+            if ($name === 'id') continue;
+    
+            $type = $property->getType();
+            $typeName = $type ? $type->getName() : 'string';
+    
+            $doc = $property->getDocComment();
+            $sqlType = match ($typeName) {
+                'int'     => 'INT',
+                'float'   => 'FLOAT',
+                'bool'    => 'TINYINT(1)',
+                'string'  => 'VARCHAR(255)',
+                default   => 'TEXT',
+            };
+    
+            $nullable = 'NOT NULL';
+            $default = '';
+    
+            if ($doc) {
+                if (preg_match('/@type\s*:\s*([a-zA-Z0-9_()]+)/', $doc, $m)) {
+                    $sqlType = $m[1];
+                }
+    
+                if (preg_match('/@nullable/', $doc)) {
+                    $nullable = 'NULL';
+                }
+    
+                if (preg_match('/@default\s*:\s*(.+)/', $doc, $m)) {
+                    $val = trim($m[1], "\"'");
+                    $default = "DEFAULT '" . addslashes($val) . "'";
+                }
+            }
+    
+            $sql .= "  `$name` $sqlType $nullable $default,\n";
+        }
+    
+        $sql = rtrim($sql, ",\n") . "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n";
+    
+        return $sql;
+    }
 
 }

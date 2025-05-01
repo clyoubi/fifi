@@ -23,10 +23,10 @@ function loadEnvAndDefineConstants(string $path = __DIR__ . '/.env') {
     }
 }
 
-
 define('APP_NAME', 'App Name');
 define('APP_DESCRIPTION', 'App Description');
 define('APP_ICON', __DIR__."/assets/images/icon.jpg");
 define('APP_TAG', '');
 define('BASE_PATH', __DIR__);
 define('SECRET_KEY', "7zPBXz1YCdxK634BtUVnS1MwvrQK0tYZZ21QWptPoQ=");
+loadEnvAndDefineConstants();

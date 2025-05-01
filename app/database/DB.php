@@ -13,11 +13,10 @@ class DB implements IDB
 {
 
     private static $instance = null;
-
     private $mysqli;
     public function __construct()
     {
-        $this->mysqli = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME);
+        $this->mysqli = new mysqli(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME, DATABASE_PORT);
     }
 
     public static function getInstance()

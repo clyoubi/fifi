@@ -11,31 +11,16 @@ interface Iuser
 class User extends Model implements IUser
 {
 
+    public int $id;
+    public string $lastname;
     /**
-     * getSettings
-     *
-     * @return array(Setting)
-     */
-    public function getSettings()
-    {
-        $settings =  $this->hasMany('Setting');
-        $args = [];
-        foreach ($settings as $key => $setting) {
-            $args[$setting->setting_name] = $setting->setting_value;
-        }
+        @type:VARCHAR(150)
+        @default: John
+    **/
+    public string $firstname;
+    public string $token;
 
-        $this->settings = $args;
-    }
-
-    public function getMedia()
-    {
-        return $this->hasMany('Media', 'object_id');
-    }
-
-
-    public function login($params)
-    {
-    }
+    public function login($params) {}
 
 
     public function logout()
@@ -53,35 +38,18 @@ class User extends Model implements IUser
 
             $seed = str_split('abcdefghijklmnopqrstuvwxyz'
                 . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                . '0123456789!@#$%^&*()'); // and any other characters
-            shuffle($seed); // probably optional since array_is randomized; this may be redundant
+                . '0123456789!@#$%^&*()');
+            shuffle($seed);
             $rand = '';
             foreach (array_rand($seed, 24) as $k) $rand .= $seed[$k];
 
             $tokenGeneric = SECRET_KEY . $_SERVER["SERVER_NAME"] . time() . $rand;
             $hash .= hash('sha256', $tokenGeneric);
         }
-        if( !User::find($hash, 'token')){
+        if (!User::find($hash, 'token')) {
             $this->token = $hash;
-        }else{  
+        } else {
             $this->createToken();
         }
     }
-
-
-
-
-
-}
-
-
-class Setting extends Model
-{
-    
-}
-
-
-class Action extends Model{
-
-
 }
