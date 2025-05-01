@@ -29,4 +29,5 @@ define('APP_ICON', __DIR__."/assets/images/icon.jpg");
 define('APP_TAG', '');
 define('BASE_PATH', __DIR__);
 define('SECRET_KEY', "7zPBXz1YCdxK634BtUVnS1MwvrQK0tYZZ21QWptPoQ=");
+define('BASE_URL', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST']);
 loadEnvAndDefineConstants();

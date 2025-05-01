@@ -47,7 +47,11 @@ class Router {
 
     private function defaultRequestHandler() {
         header("{$this->request->serverProtocol} 404 Not Found");
-        return view('404');
+        http_response_code(404);
+        if (file_exists(__DIR__. '/resources/views/404.php')) {
+            return view('404');
+        }
+        return Response::send(null, 404, 'Invalid route');
     }
 
     public function resolve() {
@@ -91,15 +95,15 @@ class Router {
 
 class Request implements IRequest
 {
-    // Declare properties explicitly
     public $requestMethod;
     public $requestUri;
     public $serverProtocol;
-    // Add other $_SERVER keys you need as public properties
+    public $headers = [];
 
     function __construct()
     {
         $this->bootstrapSelf();
+        $this->headers = $this->getHeaders();
     }
 
     private function bootstrapSelf()
@@ -125,39 +129,39 @@ class Request implements IRequest
         return $result;
     }
 
-    public function get_params()
+    private function getHeaders(): array
     {
-        if ($this->requestMethod === "GET") {
-            $body = [];
+        if (function_exists('getallheaders')) {
+            return getallheaders();
+        }
+
+        // Fallback for environments where getallheaders() is unavailable (e.g., CLI, non-Apache)
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_')) {
+                $name = str_replace('_', '-', ucwords(strtolower(substr($key, 5)), '_'));
+                $headers[$name] = $value;
+            }
+        }
+        return $headers;
+    }
+
+    public function get_params(): array
+    {
+        $body = [];
+
+        if ($this->requestMethod === "GET" || $this->requestMethod === "DELETE" || $this->requestMethod === "PUT") {
             foreach ($_GET as $key => $value) {
                 $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
-
-            return $body;
         }
 
-        if ($this->requestMethod == "POST") {
-            $body = [];
+        if ($this->requestMethod === "POST") {
             foreach ($_POST as $key => $value) {
                 $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
-            return $body;
         }
 
-        if ($this->requestMethod == "DELETE") {
-            $body = [];
-            foreach ($_GET as $key => $value) {
-                $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-            return $body;
-        }
-
-        if ($this->requestMethod == "PUT") {
-            $body = [];
-            foreach ($_GET as $key => $value) {
-                $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-            return $body;
-        }
+        return $body;
     }
 }

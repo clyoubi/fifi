@@ -12,11 +12,11 @@ function stringify($string)
 }
 
 function autoCaster($key, $value){
-    if(preg_match('(id|age|period|status)', $key) === 1){
+    if(preg_match('(id)', $key) === 1){
         return (int)$value;
     }
 
-    if( preg_match('(sync|trash)', $key) === 1){
+    if( preg_match('(deleted)', $key) === 1){
         return boolval($value);
     }
 
@@ -37,7 +37,7 @@ function object_to_prop_array_name( $object ){
 
 
 function get_assets($file){
-    echo "/assets/".$file;
+    echo BASE_URL . "/assets/".$file;
 }
 
 function view($view, $name = '', $args = []) {

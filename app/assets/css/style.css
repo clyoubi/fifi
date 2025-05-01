@@ -1,11 +1,10 @@
 :root{
     --black: #0f0e0e; 
-    --red: #eb4364; 
-    --pink: #eb436523; 
-    --header-button-shadow: 0 0 13px 1px #3d3d3d47; 
+    --primary: #eb4364; 
+    --primary-dark: #eb436523; 
     --radius: 3px;
     --white: #f5f5f5d9; 
-    --blue: #3b5998; 
+    --accent: #3b5998; 
 }
 html{
     box-sizing: border-box;
@@ -22,10 +21,10 @@ main {
     box-sizing: inherit;
 }
 ::selection {
-    background-color: var(--pink);  
+    background-color: var(--primary-dark);  
 }
 ::-moz-selection {
-    background-color: var(--pink);  
+    background-color: var(--primary-dark);  
 }
 /* Remove default padding */
 ul,

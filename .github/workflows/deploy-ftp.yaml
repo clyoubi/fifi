@@ -1,5 +1,6 @@
 name: 🚀 Deploy website on FTP hosting
 on:
+    workflow_dispatch:
     push:
         tags:
             - 'prod.*'
@@ -18,16 +19,10 @@ jobs:
         echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> ./app/.env
         echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> ./app/.env
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> ./app/.env
-        echo "TABLE_PREFIX=${{ secrets.DATABASE_HOST }}" >> ./app/.env
-        echo "DATABASE_PORT=${{ secrets.DATABASE_HOST }}" >> ./app/.env
-        echo "BASE_URL=${{ vars.DATABASE_HOST }}" >> ./app/.env
+        echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> ./app/.env
+        echo "TABLE_PREFIX=${{ vars.TABLE_PREFIX }}" >> ./app/.env
 
     - name: 🗃️ Initialize database schema
-      env:
-        DB_HOST: ${{ secrets.DATABASE_HOST }}
-        DB_USER: ${{ secrets.DATABASE_USER }}
-        DB_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-        DB_NAME: ${{ secrets.DATABASE_NAME }}
       run: |
         run: php ./cli.php migrate
 
@@ -36,10 +31,13 @@ jobs:
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
-        server-dir: ${{ secrets.SERVER_DIR }}
+        server-dir: ${{ vars.SERVER_DIR }} #public_html/www/
         local-dir: ./app/
         password: ${{ secrets.FTP_PASSWORD }}
+        port: ${{secrets.FTP_PORT}}
         exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+
+            //91.216.107.187

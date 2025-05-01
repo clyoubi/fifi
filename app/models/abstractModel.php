@@ -3,7 +3,7 @@
 interface IModel
 {
     public static function find($id, $whereColumn);
-    public static function all();
+    public static function findAll();
     public function save();
 }
 
@@ -27,14 +27,21 @@ abstract class Model implements IModel
 
     public static function find($id, $whereColumn = "id")
     {
-        $query = "SELECT * FROM " . the_object_tablename(get_called_class()) . " WHERE $whereColumn = '$id' LIMIT 1";
+        $query = "SELECT * FROM " . the_object_tablename(get_called_class()) . " WHERE $whereColumn = '$id'";
         $result = DB::getInstance()->query($query);
 
-        return Model::toObject($result, get_called_class(), true);
+        return Model::toObject($result, get_called_class());
+    }
+
+    public static function findLike($whereColumn, $value)
+    {
+        $query = "SELECT * FROM " . the_object_tablename(get_called_class()) . " WHERE $whereColumn LIKE '%$value%'";
+        $result = DB::getInstance()->query($query);
+        return Model::toObject($result, get_called_class());
     }
 
 
-    public static function all($foreign_id = null)
+    public static function findAll($foreign_id = null)
     {
 
         $query = "SELECT * FROM " . the_object_tablename(get_called_class());
@@ -126,24 +133,9 @@ abstract class Model implements IModel
             if ($single) {
                 return (isset($objects[0])) ? $objects[0] : false;
             }
-        } else {
-            return null;
         }
 
         return $objects;
-    }
-
-    public function save2()
-    {
-
-        if ($this->checkRequiredFields()) {
-            $id = DB::getInstance()->insert($this, get_object_tablename($this));
-            return $id;
-            // return (new Response($this->find($id)))->sendJson();
-        }
-
-        // return (new Response([], false, DB::getInstance()->mysqli->error))->sendJson();
-        return false;
     }
 
 

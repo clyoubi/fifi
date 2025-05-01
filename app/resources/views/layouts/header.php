@@ -4,7 +4,7 @@ global $seoMeta;
 $title = $seoMeta['title'] ?? APP_NAME;
 $description = $seoMeta['description'] ?? '';
 $image = $seoMeta['image'] ?? '';
-$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$url = BASE_URL . $_SERVER['REQUEST_URI'];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -30,11 +30,11 @@ $url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['RE
     <meta name="twitter:title" content="<?php echo htmlspecialchars($title); ?>">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($description); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($image); ?>">
-    <link rel="icon" href="<?php echo htmlspecialchars($image); ?>" type="image/x-icon">
+    <link rel="icon" href="<?php get_assets('images/icon.jpg'); ?>" type="image/x-icon">
 
     <!-- style and scripts -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <script src="assets/js/jquery.min.js"></script>
+    <link rel="stylesheet" href="<?php get_assets('css/style.css'); ?>">
+    <script src="<?php get_assets('js/jquery.min.js'); ?>"></script>
 </head>
 
 <body>

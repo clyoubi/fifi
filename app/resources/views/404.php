@@ -1,8 +1,11 @@
 <?php
 /**
 ** title: 404 Page not found
-** description: Learn more about our company.
-** image: /assets/images/about-featured.jpg
+** description: Page not found, Bad request.
 **/
 ?>
-<h1>404 Not Found</h1>
+<h1 style="display: block;
+    text-align: center;
+    margin: auto;
+    padding: 1rem;
+    font-size: 5rem;">404 Not Found</h1>

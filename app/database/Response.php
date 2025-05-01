@@ -1,28 +1,18 @@
 <?php
 
     interface IRresponse{
-        public function sendJson();
+        public static function send(object|array|null $datas, int $statusCode, string $message);
     }
     class Response implements IRresponse{
 
-        private $datas = [];
-        private $status = false;
-        private $message = "";
-
-        public function __construct($datas, $status = true, $message = '')
-        {
-            $this->datas = $datas;    
-            $this->status = $status;    
-            $this->message = $message;    
-        }
-
-
-        public function sendJson(){
+        public static function send(object|array|null $datas, int $statusCode = 200, string $message=""){
+            http_response_code($statusCode);
+            header('Content-Type: application/json');
             echo json_encode(
                 array(
-                    "status"=>$this->status,
-                    "message"=>$this->message,
-                    "datas"=>$this->datas,
+                    "status"=>$statusCode,
+                    "message"=>$message,
+                    "datas"=>$datas,
                 )
             );
         }
