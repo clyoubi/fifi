@@ -5,7 +5,7 @@ interface IDB
     //public function select( $query, $className );
     public function where($className, $whereColumn, $columnValue);
     public function insert($object);
-    public function update($table, $values);
+    public function update(string $table, array $values);
     public function query($query);
 }
 
@@ -81,14 +81,7 @@ class DB implements IDB
 
 
 
-    /**
-     * update
-     *
-     * @param  string $table
-     * @param  array $values
-     * @return boolean
-     */
-    public function update( $values, $table)
+    public function update( string $values, array $table)
     {
        
         $text = [];

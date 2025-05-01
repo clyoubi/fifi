@@ -29,9 +29,7 @@ jobs:
         DB_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         DB_NAME: ${{ secrets.DATABASE_NAME }}
       run: |
-        sudo apt-get update
-        sudo apt-get install -y mysql-client
-        mysql -h $DB_HOST -u$DB_USER -p$DB_PASSWORD $DB_NAME < ./app/database/db.sql
+        run: php ./cli.php migrate
 
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
