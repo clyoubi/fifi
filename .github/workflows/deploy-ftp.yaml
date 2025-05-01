@@ -1,0 +1,44 @@
+name: 🚀 Deploy website on FTP hosting
+on:
+    push:
+        tags:
+            - 'prod.*'
+            - 'staging.*'
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+    
+    - name: 🛠️ Create DB credentials
+      run: |
+        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" > ./app/.env
+        echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> ./app/.env
+        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> ./app/.env
+        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> ./app/.env
+
+    - name: 🗃️ Initialize database schema
+      env:
+        DB_HOST: ${{ secrets.DATABASE_HOST }}
+        DB_USER: ${{ secrets.DATABASE_USER }}
+        DB_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+        DB_NAME: ${{ secrets.DATABASE_NAME }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-client
+        mysql -h $DB_HOST -u$DB_USER -p$DB_PASSWORD $DB_NAME < ./app/database/db.sql
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        server-dir: ${{ secrets.SERVER_DIR }}
+        local-dir: ./app/
+        password: ${{ secrets.FTP_PASSWORD }}
+        exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**

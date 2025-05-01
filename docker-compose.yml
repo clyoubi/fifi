@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports: 
+      - "9000:80"
+    depends_on:
+        - db
+    container_name: php_apache
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}   # Use the database from .env
+      MYSQL_USER: ${DATABASE_USER}       # Use the username from .env
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}   # Use the password from .env
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+    
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
